@@ -38,6 +38,7 @@ data/*.json
 
 # Results
 results/
+!results/*.md
 *.png
 
 # Telegram config
