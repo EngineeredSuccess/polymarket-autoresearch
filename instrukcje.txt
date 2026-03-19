@@ -1,0 +1,37 @@
+Step 1: Understand the Fundamentals of Polymarket and the Formulas
+Build a solid grasp of how Polymarket works (it’s an automated market maker for binary or multi-outcome events) and each formula. Use AI to break them down simply.
+	•	AI Prompt for Overall Setup: “Explain Polymarket’s basics as a prediction market, including how liquidity and pricing work via LMSR. Then, summarize the six hedge fund formulas from this article: [paste the six formula descriptions from above]. Provide simple examples for each in the context of a political or crypto event market.”
+	•	AI Prompts for Individual Formulas (run one per formula to deepen understanding):
+	1	LMSR Pricing Model: “Explain the LMSR formula Price_i = e^{q_i / b} / Σ e^{q_j / b} in simple terms. How do hedge funds use it to predict trade impact on Polymarket? Give an example with a low-liquidity market (b=50) and calculate the price change after buying 10 YES shares.”
+	2	Kelly Criterion: “Break down the Kelly Criterion formula f* = (p * odds - (1-p)) / odds. How does it help size bets on Polymarket to maximize growth without ruin? Example: If my edge p=0.55 on a market priced at 0.50, what’s the optimal fraction of my $10K bankroll to bet?”
+	3	Expected Value (EV) Gap: “Describe the EV Gap formula EV = (p_true - price) * (1/price). How do quants scan for mispricings? Example: Market at 47% for an event, my model says 52%—calculate EV and decide if it’s worth betting $1K.”
+	4	KL-Divergence: “Explain KL-Divergence D_KL(P||Q) = Σ P_i log(P_i / Q_i) for spotting correlated market arbs on Polymarket. Example: Compare probabilities for two related 2028 election candidates (e.g., Vance at 21%, Newsom at 17%) and interpret if KL > 0.2 signals a hedge opportunity.”
+	5	Bregman Projection: “Simplify the Bregman Projection formula min D_φ(μ||θ) subject to constraints. How does it optimize arbitrage in multi-outcome markets like Oscars? Provide a high-level example with 3 outcomes and why it’s useful for risk-free edges.”
+	6	Bayesian Update: “Explain Bayesian Update P(H|E) = P(E|H) * P(H) / P(E). How do funds use it for dynamic adjustments on Polymarket? Example: Start with 50% prior on Elon tweeting today; new evidence (buzz spike) with likelihood 0.8—calculate the posterior.”
+Step 2: Set Up Your Data Pipeline
+You need real-time data from Polymarket (markets, prices, volumes). The article mentions Polygon API keys—sign up at polygon.io if needed (free tier available).
+	•	AI Prompt for Data Access: “Guide me on setting up Polymarket data access via the Polygon API. Include sample Python code using requests or polygon library to fetch current prices, liquidity (b parameter), and volumes for a specific market like ‘BTC price direction in next 5 minutes’. Handle API keys securely.”
+	•	AI Prompt for Data Aggregation: “Write Python code to pull historical resolution data for 50 Polymarket events from 2025 (use public sources or simulate if needed). Store in a pandas DataFrame with columns: event_name, market_price, true_outcome, volume.”
+Step 3: Implement and Test Each Formula in Code
+Code the formulas individually, then integrate. Use the article’s “homework” as a base—AI can generate the missing code snippets.
+	•	AI Prompts for Coding Each Formula (run sequentially, building on prior code):
+	1	LMSR: “Write a Python function using numpy to compute LMSR prices: def lmsr_price(q, b): … Test it on a binary market with q=[0,0], b=100, then simulate buying 10 YES shares and show the new price.”
+	2	Kelly: “Create a Python function def kelly_fraction(p, price): … (where odds=1/price-1). Add fractional Kelly (e.g., 0.5x) for safety. Test: p=0.25, price=0.21, bankroll=$5K—output bet size.”
+	3	EV Gap: “Code a function def ev_gap(p_true, price): … Return EV and a ‘bet’ recommendation if EV > 0.05. Loop over a list of 10 sample markets and flag +EV ones.”
+	4	KL-Divergence: “Implement KL-Divergence in Python with scipy: def kl_divergence(p, q): … Test on two correlated market prob vectors, e.g., p=[0.21, 0.79], q=[0.17, 0.83]. Flag arb if >0.2.”
+	5	Bregman Projection: “Using cvxpy, write code for Bregman Projection (KL variant) to find arb in a 3-outcome market. Constraints: probs sum to 1. Example inputs: initial θ=[0.3,0.3,0.4], solve for μ.”
+	6	Bayesian: “Code a Bayesian update function def bayesian_update(prior, likelihood, evidence_prob): … Example: Prior=0.5, P(E|H)=0.8, P(E)=0.6—compute posterior. Extend to chain multiple updates from X sentiment data.”
+	•	AI Prompt for Integration: “Combine the six formulas into a Python script. Input: Market data dict (price, volume, my_p). Output: EV, Kelly size, KL with correlated market, updated Bayesian prob, LMSR impact simulation. Use numpy/scipy/cvxpy.”
+Step 4: Backtest and Optimize
+Test on historical data to validate edges. Aim for Sharpe ratio >1.5 as per the article.
+	•	AI Prompt for Backtesting Setup: “Write Python code for walk-forward backtesting on Polymarket data. For each of 50 historical markets: Compute EV/KL/Bayesian updates, size with Kelly, simulate trades (assume 1% fee). Track metrics: ROI, win rate, drawdown. Plot growth curve with matplotlib.”
+	•	AI Prompt for Optimization: “Suggest improvements to my backtest code [paste your code]. Add risk controls: Halve Kelly on drawdown >20%, filter low-volume markets (<$1M). Simulate regime shifts like increased 2026 volatility.”
+Step 5: Build and Deploy a Basic Quant Bot
+Follow the article’s replication steps: Data setup, integration, backtest, deploy.
+	•	AI Prompt for Bot Framework: “Build a Python bot script for Polymarket trading. Use Polygon API for real-time data, compute signals from the six formulas (EV >0.05, KL >0.2, etc.), size with Kelly. Alert via Telegram if +EV. Schedule with cron/Railway for every 5 minutes on short-term markets like BTC up/down.”
+	•	AI Prompt for Alerts and Execution: “Add Telegram integration to my bot code using python-telegram-bot. Message format: ‘Edge detected: Market [name], EV [value], Bet size [amount]’. For automation, suggest safe ways to execute trades via Polymarket API (read-only for now).”
+Step 6: Risk Management and Iteration
+Always prioritize avoiding ruin. Monitor ethics (e.g., avoid sensitive events).
+	•	AI Prompt for Risks: “Based on the Polymarket formulas article, list top risks (e.g., overfitting, fees) and mitigation strategies. Write code to enforce: Stop if drawdown >20%, log all trades, compute Sharpe ratio monthly.”
+	•	AI Prompt for Iteration: “Review my full bot code [paste it] for bugs/optimizations. Suggest additions: Incorporate X sentiment (e.g., via API) for Bayesian evidence, or machine learning (torch) to estimate p_true from polls/tweets.”
+Start with paper trading (simulate without real money) for 1-2 weeks. Scale up gradually from $1K as edges prove out. If you run into issues or need code tweaks, share details in follow-up prompts!

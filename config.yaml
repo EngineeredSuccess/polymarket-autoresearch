@@ -1,0 +1,21 @@
+# Polymarket Quant Bot Configuration
+
+# Trading Settings
+INITIAL_BANKROLL: 10000  # $10K starting capital
+KELLY_MULTIPLIER: 0.5  # Fractional Kelly (0.5 = half Kelly for safety)
+EV_THRESHOLD: 0.05  # Minimum EV to place bet
+KL_THRESHOLD: 0.2  # KL-Divergence threshold for arb
+MIN_VOLUME: 1000000  # Minimum market volume ($1M)
+
+# Risk Management
+MAX_DRAWDOWN: 0.20  # Stop trading at 20% drawdown
+KELLY_HALVE_DRAWDOWN: 0.20  # Halve Kelly if drawdown > 20%
+TRADING_FEE: 0.01  # 1% fee per trade
+
+# Bot Settings
+CHECK_INTERVAL: 300  # seconds (5 minutes)
+TELEGRAM_BOT_TOKEN: ""  # For alerts (optional)
+TELEGRAM_CHAT_ID: ""
+
+# Data Settings
+HISTORICAL_DATA_FILE: "data/historical_markets.csv"

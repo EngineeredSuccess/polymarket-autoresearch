@@ -1,0 +1,12 @@
+# Polymarket Autoresearch - Dependencies
+
+# Core
+numpy>=1.24.0
+requests>=2.31.0
+
+# Optional (for analysis)
+pandas>=2.0.0
+matplotlib>=3.7.0
+
+# RunPod (if using cloud)
+# runpod>=1.0.0
