@@ -84,7 +84,9 @@ class TradingBot:
         if sentiment_summary["fear_greed"]:
             fg_value = sentiment_summary["fear_greed"]["value"]
             my_p = bayesian_sentiment_update(
-                prior=price, fear_greed_value=fg_value, strength=0.3
+                prior=price,
+                fear_greed_value=fg_value,
+                strength=self.config.get("SENTIMENT_STRENGTH", 1.0),
             )
         else:
             my_p = price
@@ -154,7 +156,9 @@ class TradingBot:
 
         return results
 
-    def run_live_scan(self, keywords: List[str] = None, limit: int = 5):
+    def run_live_scan(
+        self, keywords: List[str] = None, limit: int = 5, interval: int = 300
+    ):
         """
         Run live scan and show top opportunities.
 
@@ -184,8 +188,10 @@ class TradingBot:
             print(f"Adjustment: {sentiment['adjustment']:+.2f}")
 
         print(f"\nBankroll: ${self.bankroll:,.2f}")
-        print(f"Min EV: {self.config.get('EV_THRESHOLD', 0.05):.0%}")
+        print(f"Min EV: {self.config.get('EV_THRESHOLD', 0.02):.0%}")
         print(f"Kelly Mult: {self.config.get('KELLY_MULTIPLIER', 0.5):.1f}x")
+        print(f"Min Volume: ${self.config.get('MIN_VOLUME', 500000):,}")
+        print(f"Sentiment Strength: {self.config.get('SENTIMENT_STRENGTH', 1.0):.1f}")
 
         print(f"\n{'=' * 70}")
 
@@ -249,6 +255,10 @@ def main():
     )
     parser.add_argument("--backtest", action="store_true", help="Run backtest")
     parser.add_argument("--test", action="store_true", help="Test sentiment")
+    parser.add_argument("--loop", action="store_true", help="Run continuously")
+    parser.add_argument(
+        "--interval", type=int, default=300, help="Loop interval in seconds"
+    )
 
     args = parser.parse_args()
 
@@ -259,6 +269,13 @@ def main():
 
         analyze_market_sentiment("BTC")
 
+    elif args.loop:
+        print(f"\nStarting continuous loop (interval: {args.interval}s)")
+        print("Press Ctrl+C to stop\n")
+        while True:
+            bot.run_live_scan(keywords=args.keywords, interval=args.interval)
+            time.sleep(args.interval)
+
     elif args.scan:
         bot.run_live_scan(keywords=args.keywords)
 
@@ -268,12 +285,17 @@ def main():
     else:
         print("""
 Polymarket Trading Bot
-=====================
+====================
 
 Usage:
-  python trading_bot.py --scan      # Scan for opportunities
-  python trading_bot.py --backtest  # Run backtest
-  python trading_bot.py --test      # Test sentiment
+  python trading_bot.py --scan       # Single scan
+  python trading_bot.py --scan --loop # Continuous scan
+  python trading_bot.py --backtest   # Run backtest
+  python trading_bot.py --test       # Test sentiment
+
+Examples:
+  python trading_bot.py --scan
+  python trading_bot.py --scan --loop --interval 180 --keywords BTC ETH
         """)
 
 
