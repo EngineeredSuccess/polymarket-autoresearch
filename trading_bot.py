@@ -70,10 +70,11 @@ class TradingBot:
         Returns:
             Analysis with signals and recommendation
         """
-        price = float(market.get("yes_price", market.get("close_price", 0.5)))
+        price = float(market.get("yes_price", 0.5))
         volume = float(market.get("volume", 0))
         question = market.get("question", "Unknown")
-        market_id = market.get("market_id", "")
+        market_id = market.get("id", "")
+        token_id = market.get("yes_token_id", "")
         b = market.get("b", 100)
 
         if volume < self.config.get("MIN_VOLUME", 1000000):
@@ -116,6 +117,7 @@ class TradingBot:
         return {
             "action": action,
             "market_id": market_id,
+            "token_id": token_id,
             "question": question,
             "price": price,
             "volume": volume,
@@ -123,6 +125,7 @@ class TradingBot:
             "ev": ev,
             "kelly_frac": kelly_frac,
             "bet_size": bet_size,
+            "market": market,
             "fear_greed": sentiment_summary.get("fear_greed"),
             "reason": "; ".join(reason) if reason else "No signal",
             "recommendation": sentiment_summary.get("recommendation", ""),
@@ -146,7 +149,7 @@ class TradingBot:
         markets = self.data.get_markets(limit=100)
 
         for mkt in markets:
-            if isinstance(mkt, dict):
+            if isinstance(mkt, dict) and mkt.get("active") and not mkt.get("closed"):
                 question = mkt.get("question", "").lower()
                 if any(kw.lower() in question for kw in keywords):
                     analysis = self.analyze_market(mkt)
@@ -204,6 +207,7 @@ class TradingBot:
                     f"   Price: {opp['price']:.1%} | Your Prob: {opp['my_p']:.1%} | EV: {opp['ev']:.1%}"
                 )
                 print(f"   Bet: ${opp['bet_size']:.2f} ({opp['kelly_frac']:.1%} Kelly)")
+                print(f"   Token: {opp.get('token_id', 'N/A')[:20]}...")
                 print(f"   Reason: {opp['reason']}")
                 print()
 

@@ -18,6 +18,25 @@ class PolymarketData:
     def __init__(self, api_key: str = None):
         self.api_key = api_key
 
+    def _enrich_market(self, m: dict):
+        """Add derived fields to market dict."""
+        try:
+            import json
+
+            clob_tokens = m.get("clobTokenIds", "[]")
+            if isinstance(clob_tokens, str):
+                clob_tokens = json.loads(clob_tokens)
+            if clob_tokens and len(clob_tokens) > 0:
+                m["yes_token_id"] = clob_tokens[0]
+
+            prices = m.get("outcomePrices", "[]")
+            if isinstance(prices, str):
+                prices = json.loads(prices)
+            if prices and len(prices) > 0:
+                m["yes_price"] = float(prices[0])
+        except Exception:
+            pass
+
     def get_markets(self, limit: int = 50, closed: bool = False) -> List[Dict]:
         """
         Fetch active markets from Gamma API.
@@ -27,7 +46,7 @@ class PolymarketData:
             closed: Include closed markets
 
         Returns:
-            List of market dictionaries
+            List of market dictionaries with enriched fields
         """
         try:
             url = f"{self.GAMMA_API}/markets"
@@ -37,7 +56,10 @@ class PolymarketData:
             }
             response = requests.get(url, params=params, timeout=10)
             response.raise_for_status()
-            return response.json()
+            markets = response.json()
+            for m in markets:
+                self._enrich_market(m)
+            return markets
         except Exception as e:
             print(f"Error fetching markets: {e}")
             return self._mock_market_list()
